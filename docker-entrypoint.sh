@@ -10,6 +10,16 @@ if [ ! -f /var/www/html/.env ]; then
   fi
 fi
 
+# Si DATABASE_URL está presente, configurar conexión PostgreSQL
+if [ -n "$DATABASE_URL" ]; then
+  export DB_CONNECTION=pgsql
+  sed -i '/^DB_CONNECTION=/d' /var/www/html/.env 2>/dev/null || true
+  sed -i '/^DATABASE_URL=/d' /var/www/html/.env 2>/dev/null || true
+  echo "DB_CONNECTION=pgsql" >> /var/www/html/.env
+  echo "DATABASE_URL=$DATABASE_URL" >> /var/www/html/.env
+  echo "Configurada conexión a PostgreSQL con DATABASE_URL."
+fi
+
 # Si APP_KEY viene en las variables de entorno de Render, escribirla en .env si está vacía
 if [ -n "$APP_KEY" ]; then
   if ! grep -q "^APP_KEY=" /var/www/html/.env 2>/dev/null; then
