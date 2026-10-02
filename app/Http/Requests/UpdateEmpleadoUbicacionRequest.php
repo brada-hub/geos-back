@@ -22,7 +22,7 @@ class UpdateEmpleadoUbicacionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'cajon_id' => 'required|exists:cajones,id',
+            'cajon_id' => 'nullable|exists:cajones,id',
         ];
     }
 }

@@ -14,7 +14,7 @@ class StoreMuebleRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'sede_id' => 'required|exists:sedes,id',
+            'sede_id' => 'nullable|exists:sedes,id',
             'nombre' => 'required|string|max:255',
             'filas' => 'required|integer|min:1|max:20',
             'columnas' => 'required|integer|min:1|max:20',
