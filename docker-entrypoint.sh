@@ -1,31 +1,46 @@
 #!/bin/bash
 set -e
 
-# Esperar a que la base de datos esté lista si es necesario
-if [ -n "$DB_HOST" ]; then
-  echo "Esperando conexión a base de datos en $DB_HOST:$DB_PORT..."
+# Asegurar que el archivo .env exista para comandos de Artisan
+if [ ! -f /var/www/html/.env ]; then
+  if [ -f /var/www/html/.env.example ]; then
+    cp /var/www/html/.env.example /var/www/html/.env
+  else
+    touch /var/www/html/.env
+  fi
 fi
 
-# Generar APP_KEY si no está seteada
-if [ -z "$APP_KEY" ]; then
-  php artisan key:generate --force
+# Si APP_KEY viene en las variables de entorno de Render, escribirla en .env si está vacía
+if [ -n "$APP_KEY" ]; then
+  if ! grep -q "^APP_KEY=" /var/www/html/.env 2>/dev/null; then
+    echo "APP_KEY=$APP_KEY" >> /var/www/html/.env
+  fi
+else
+  # Si no existe APP_KEY, generarla
+  php artisan key:generate --force || true
 fi
+
+# Configurar puerto dinámico de Apache para Render (Render usa la variable $PORT, ej. 10000)
+PORT="${PORT:-80}"
+echo "Configurando Apache para escuchar en el puerto: $PORT"
+sed -i "s/Listen 80/Listen $PORT/g" /etc/apache2/ports.conf || true
+sed -i "s/<VirtualHost \*:80>/<VirtualHost \*:$PORT>/g" /etc/apache2/sites-available/*.conf || true
 
 # Optimizar caché de Laravel
 php artisan config:cache || true
 php artisan route:cache || true
 php artisan view:cache || true
 
-# Ejecutar migraciones automáticamente si RUN_MIGRATIONS=true o por defecto
+# Ejecutar migraciones automáticamente
 if [ "$RUN_MIGRATIONS" != "false" ]; then
   echo "Ejecutando migraciones de Laravel..."
   php artisan migrate --force || true
-  # Ejecutar seeders si es primera vez y se especifica RUN_SEEDERS=true
+
   if [ "$RUN_SEEDERS" = "true" ]; then
     echo "Ejecutando seeders iniciales..."
     php artisan db:seed --force || true
   fi
 fi
 
-# Iniciar Apache
+echo "Iniciando servidor web..."
 exec "$@"
