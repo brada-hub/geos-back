@@ -69,7 +69,7 @@ if [ "$RUN_MIGRATIONS" != "false" ]; then
   php artisan migrate --force || true
 
   echo "Ejecutando seeders de Laravel..."
-  php artisan db:seed --class=SedesBoliviaSeeder --force || true
+  php artisan db:seed --force || true
 fi
 
 # Asegurar permisos finales para www-data
