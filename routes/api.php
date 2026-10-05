@@ -20,6 +20,7 @@ Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:6,
 Route::middleware(['auth:sanctum', 'throttle:180,1'])->group(function () {
     // Sesión
     Route::get('/me', [AuthController::class, 'me']);
+    Route::post('/change-password', [AuthController::class, 'updatePassword']);
     Route::post('/logout', [AuthController::class, 'logout']);
 
     // Catálogos Normalizados (3FN)

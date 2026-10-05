@@ -58,6 +58,34 @@ class AuthController extends Controller
     }
 
     /**
+     * Actualizar contraseña del usuario autenticado
+     */
+    public function updatePassword(Request $request)
+    {
+        $request->validate([
+            'current_password' => 'required|string',
+            'new_password' => 'required|string|min:6|confirmed',
+        ]);
+
+        $user = $request->user();
+
+        if (!Hash::check($request->current_password, $user->password)) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'La contraseña actual no es correcta.',
+            ], 422);
+        }
+
+        $user->password = Hash::make($request->new_password);
+        $user->save();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Contraseña actualizada correctamente.',
+        ]);
+    }
+
+    /**
      * Cerrar sesión y revocar token
      */
     public function logout(Request $request)
