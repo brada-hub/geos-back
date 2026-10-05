@@ -42,6 +42,10 @@ class AuthController extends Controller
                 'id' => $user->id,
                 'name' => $user->name,
                 'email' => $user->email,
+                'role' => $user->role ?? 'admin',
+                'cargo' => $user->cargo,
+                'permissions' => $user->permissions ?? [],
+                'activo' => $user->activo ?? true,
             ],
         ]);
     }

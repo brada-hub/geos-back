@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\EmpleadoController;
 use App\Http\Controllers\Api\MuebleController;
 use App\Http\Controllers\Api\CajonController;
 use App\Http\Controllers\Api\CatalogoController;
+use App\Http\Controllers\Api\UserController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -60,4 +61,10 @@ Route::middleware(['auth:sanctum', 'throttle:180,1'])->group(function () {
     Route::patch('/empleados/{empleado}/ubicacion', [EmpleadoController::class, 'updateUbicacion']);
     Route::get('/empleados/{empleado}/movimientos', [EmpleadoController::class, 'getMovimientos']);
     Route::post('/empleados/{empleado}/movimientos', [EmpleadoController::class, 'storeMovimiento']);
+
+    // Gestión de Usuarios, Roles y Permisos
+    Route::get('/usuarios', [UserController::class, 'index']);
+    Route::post('/usuarios', [UserController::class, 'store']);
+    Route::patch('/usuarios/{usuario}', [UserController::class, 'update']);
+    Route::delete('/usuarios/{usuario}', [UserController::class, 'destroy']);
 });
